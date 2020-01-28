@@ -13,4 +13,5 @@ RUN pip3 install  \
    fuzzywuzzy \
    python-Levenshtein \
    extract_msg \
-   /Users/arun.wagle@ibm.com/IBM/Demos/Watson/clients/EverestRe/submission-git/submission/distarunwagle_submission_intake_utils-0.0.1-py3-none-any.whl
+   -e git+https://github.com/arunwagle/submission-git.git@master#egg=arunwagle_submission_intake_utils
+   
