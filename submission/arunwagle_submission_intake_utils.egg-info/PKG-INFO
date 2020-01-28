@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: arunwagle-submission-intake-utils
+Version: 0.0.1
+Summary: Utils Package
+Home-page: GITHUB_URL
+Author: Arun Wagle
+Author-email: arun.wagle@ibm.com
+License: UNKNOWN
+Description: # Utils  Package
+        
+        This is a simple example package. You can use
+        [Github-flavored Markdown](https://guides.github.com/features/mastering-markdown/)
+        to write your content.
+        
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

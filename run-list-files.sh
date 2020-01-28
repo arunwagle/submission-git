@@ -1,0 +1,2 @@
+ibmcloud fn action get --summary /OSNorth.Arun.Wagle.Org_FastStart/submission_intake/list_files
+ibmcloud fn action invoke --blocking --result /OSNorth.Arun.Wagle.Org_FastStart/submission_intake/list_files --param ''

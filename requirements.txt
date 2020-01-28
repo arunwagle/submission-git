@@ -1,0 +1,13 @@
+ibm_db_sa
+ibm_db
+ibm-cos-sdk
+ibm_cloud_sdk_core==1.0.0
+ibm_watson
+pandas
+python-dateutil
+requests
+PyPDF2
+fuzzywuzzy
+python-Levenshtein
+extract_msg
+/Users/arun.wagle@ibm.com/IBM/Demos/Watson/clients/EverestRe/submission-git/submission/dist/arunwagle_submission_intake_utils-0.0.1-py3-none-any.whl
