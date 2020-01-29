@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="arunwagle_submission_intake_utils", # Replace with your own username
-    version ="1.0.1",
+    version ="1.0.6",
     author="Arun Wagle",
     author_email="arun.wagle@ibm.com",
     description="Utils Package",

@@ -165,10 +165,10 @@ def main(params):
 
     except (ibm_db.conn_error, ibm_db. conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = {"result": {}, "error": ibm_db.stmt_errormsg()}
+        json_result = {"result": {}, "error": err}
         return json_result
 
-    return {"result": "SUCCESS"}
+    return {"result": "Flow should not reach here"}
 
 
 if __name__ == "__main__":

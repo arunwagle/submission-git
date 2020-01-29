@@ -13,5 +13,5 @@ RUN pip3 install  \
    fuzzywuzzy \
    python-Levenshtein \
    extract_msg \
-   -e git+https://github.com/arunwagle/submission-git.git@master#egg=arunwagle_submission_intake_utils
+   arunwagle-submission-intake-utils==1.0.6
    

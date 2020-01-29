@@ -120,7 +120,7 @@ def main(params):
                                                     'N/A',
                                                     'N',
                                                     'RUNTIME',
-                                                    'CONVERTED_FILE') 
+                                                    'SPLIT_PDF') 
                                                 )       
                                                 '''
                                     print ("sql: {}".format(sql))
@@ -135,19 +135,34 @@ def main(params):
                                 break
                             else:
                                 time.sleep(2)
+                   
+        # End of for loop for PDF conversion
 
-                
-                # extracting data in json format 
+        db_conn = db2utils.get_connection()
+        sql = f'''SELECT ID, STATUS, TO_CHAR(FIRST_UPDATED,'YYYY-MM-DD HH.MI.SS') as FIRST_UPDATED, 
+                TO_CHAR(LAST_UPDATED,'YYYY-MM-DD HH.MI.SS') as LAST_UPDATED FROM FINAL TABLE 
+                (UPDATE EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS SET STATUS = 'SPLIT_PDF' where ID = {submission_id})
+                '''
 
+        print("sql: {}".format(sql))
 
-            
-        # print(data)
+        stmt = ibm_db.exec_immediate(db_conn, sql)
+        result = ibm_db.fetch_assoc(stmt)
+
+        result_list = []
+        if result:         
+            result_list.append(result)
+
+        json_result = {"result": result_list, "error": {}}
+        print(f'json_result: {json_result}')
+        return json_result
 
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = json.dumps(err)    
-        
-    return {"result": "dd"}
+        json_result = {"result": {}, "error": err}
+        return json_result
+
+    return {"result": "Flow should not reach here"}
 
     
 if __name__ == "__main__":

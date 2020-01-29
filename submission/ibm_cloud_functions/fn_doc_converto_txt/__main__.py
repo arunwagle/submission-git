@@ -49,9 +49,10 @@ def main(params):
             raise Exception("Pass mode")
 
         final_pdf_object_storage_key = submissions_data_folder + "/" + \
-            mode + "/" + submission_id + "/final_pdf/split_pdf_dir"
+            mode + "/" + submission_id + "/final_pdf_split"
         final_txt_object_storage_key_prefix = submissions_data_folder + \
-            "/" + mode + "/" + submission_id + "/final_pdf"
+            "/" + mode + "/" + submission_id 
+            # + "/final_pdf"
 
         regex = r"^" + final_pdf_object_storage_key + ".*$"
 
@@ -127,7 +128,7 @@ def main(params):
                                     content = return_val["data"]["content"]
 
                                     txt_object_storage_key = final_txt_object_storage_key_prefix + \
-                                        "/" + "split_txt_dir" + "/" + file_name_without_ext + ".txt"
+                                        "/" + "standardized_txt_dir" + "/" + file_name_without_ext + ".txt"
                                     print("cos_everest_submission_bucket: {}: txt_object_storage_key: {} ".format(
                                         cos_everest_submission_bucket, txt_object_storage_key))
 
@@ -162,17 +163,31 @@ def main(params):
                                 time.sleep(2)
 
                 
-                # extracting data in json format 
+        # End of For Loop
+        db_conn = db2utils.get_connection()
+        sql = f'''SELECT ID, STATUS, TO_CHAR(FIRST_UPDATED,'YYYY-MM-DD HH.MI.SS') as FIRST_UPDATED, 
+                TO_CHAR(LAST_UPDATED,'YYYY-MM-DD HH.MI.SS') as LAST_UPDATED FROM FINAL TABLE 
+                (UPDATE EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS SET STATUS = 'APPLY_ANALYTICS' where ID = {submission_id})
+                '''
 
+        print("sql: {}".format(sql))
 
-            
-        # print(data)
+        stmt = ibm_db.exec_immediate(db_conn, sql)
+        result = ibm_db.fetch_assoc(stmt)
 
+        result_list = []
+        if result:         
+            result_list.append(result)
+
+        json_result = {"result": result_list, "error": {}}
+        print(f'json_result: {json_result}')
+        return json_result
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = json.dumps(err)    
-        
-    return {"result": "dd"}
+        json_result = {"result": {}, "error": err}
+        return json_result
+
+    return {"result": "Flow should not reach here"}
 
     
 if __name__ == "__main__":
