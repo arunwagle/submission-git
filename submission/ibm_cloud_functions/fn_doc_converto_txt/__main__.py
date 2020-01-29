@@ -147,7 +147,7 @@ def main(params):
                                                     'N/A',
                                                     'N',
                                                     'RUNTIME',
-                                                    'SPLIT_TXT_FILE')
+                                                    'APPLY_NLP')
                                                 )
                                                 '''
                                     print("sql: {}".format(sql))
@@ -167,7 +167,7 @@ def main(params):
         db_conn = db2utils.get_connection()
         sql = f'''SELECT ID, STATUS, TO_CHAR(FIRST_UPDATED,'YYYY-MM-DD HH.MI.SS') as FIRST_UPDATED, 
                 TO_CHAR(LAST_UPDATED,'YYYY-MM-DD HH.MI.SS') as LAST_UPDATED FROM FINAL TABLE 
-                (UPDATE EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS SET STATUS = 'APPLY_ANALYTICS' where ID = {submission_id})
+                (UPDATE EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS SET STATUS = 'APPLY_NLP' where ID = {submission_id})
                 '''
 
         print("sql: {}".format(sql))
