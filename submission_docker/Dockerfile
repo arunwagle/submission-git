@@ -13,5 +13,6 @@ RUN pip3 install  \
    fuzzywuzzy \
    python-Levenshtein \
    extract_msg \
+   convertapi \
    arunwagle-submission-intake-utils==1.0.6
    

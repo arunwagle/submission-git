@@ -38,9 +38,9 @@ def main(params):
         if cos_everest_submission_bucket is None or "":
             raise Exception("Pass location of the bucket")
 
-        object_id = params.get("object_id", None)
+        object_id = params.get("submission_id", None)
         if object_id is None or "":
-            raise Exception("Pass message id")
+            raise Exception("Pass submission_id ")
 
         # Create a directory on the local drive
         object_storage_key_prefix = OBJECT_STORAGE_EMAIL_ATTACHMENTS_ROOT_FOLDER + "/runtime"    
@@ -159,14 +159,18 @@ def main(params):
             id = str(result["ID"])            
             result_list.append(result)
 
-        json_result = {"result": result_list, "error": {}}
-        print(f'json_result: {json_result}')
-        return json_result
+        result_dict = {}
+        result_dict["result"] = result_list
+        result_dict["status"] = "SUCCESS"
+        
+        return result_dict
 
     except (ibm_db.conn_error, ibm_db. conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = {"result": {}, "error": err}
-        return json_result
+        result_dict = {}
+        result_dict["error"] = err
+        result_dict["status"] = "FAILURE"        
+        return result_dict
 
     return {"result": "Flow should not reach here"}
 
@@ -175,7 +179,7 @@ if __name__ == "__main__":
     # python3 -m submission.ibm_cloud_functions.fn_extract_email_msgs.__main__
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
-        'object_id': 43
+        'submission_id': 43
     }
 
     # p_json = json.dumps(param)

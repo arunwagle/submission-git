@@ -44,14 +44,19 @@ def main(params):
 
         json_result = {"result": result_list, "error": {}}
         print(f'json_result: {json_result}')
-        return json_result
+        result_dict = {}
+        result_dict["result"] = result_list
+        result_dict["status"] = "SUCCESS"
+        return result_dict
 
     except (ibm_db.conn_error, ibm_db. conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = {"result": {}, "error": ibm_db.stmt_errormsg()}
-        return json_result
+        result_dict = {}
+        result_dict["error"] = err
+        result_dict["status"] = "FAILURE"        
+        return result_dict
 
-    return None
+    return {"result": "Flow should not reach here"}
 
 
 if __name__ == "__main__":

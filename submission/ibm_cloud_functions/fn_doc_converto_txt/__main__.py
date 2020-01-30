@@ -49,9 +49,9 @@ def main(params):
             raise Exception("Pass mode")
 
         final_pdf_object_storage_key = submissions_data_folder + "/" + \
-            mode + "/" + submission_id + "/final_pdf_split"
+            mode + "/" + str(submission_id) + "/final_pdf_split"
         final_txt_object_storage_key_prefix = submissions_data_folder + \
-            "/" + mode + "/" + submission_id 
+            "/" + mode + "/" + str(submission_id)
             # + "/final_pdf"
 
         regex = r"^" + final_pdf_object_storage_key + ".*$"
@@ -179,13 +179,18 @@ def main(params):
         if result:         
             result_list.append(result)
 
-        json_result = {"result": result_list, "error": {}}
-        print(f'json_result: {json_result}')
-        return json_result
+        result_dict = {}
+        result_dict["result"] = result_list
+        result_dict["status"] = "SUCCESS"
+        
+        return result_dict
+
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = {"result": {}, "error": err}
-        return json_result
+        result_dict = {}
+        result_dict["error"] = err
+        result_dict["status"] = "FAILURE"        
+        return result_dict
 
     return {"result": "Flow should not reach here"}
 
@@ -194,7 +199,7 @@ if __name__ == "__main__":
     # python3 -m submission.ibm_cloud_functions.fn_doc_converto_txt.__main__
     param = {
         'cos_everest_submission_bucket':'everest-submission-bucket',      
-        'submission_id':'43' ,
+        'submission_id':43 ,
         'submissions_data_folder':'submission_documents_data' ,
         'mode':'runtime'
     }

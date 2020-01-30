@@ -51,7 +51,7 @@ def main(params):
             raise Exception("Pass mode")
 
         object_storage_key = submissions_data_folder + "/" + \
-            mode + "/" + submission_id 
+            mode + "/" + str(submission_id)
         
         # + "/" + final_pdf_folder
 
@@ -60,6 +60,8 @@ def main(params):
 
         file_keys = cosutils.get_bucket_contents(
             cos_everest_submission_bucket, regex)
+
+        print(file_keys)
 
         for key in file_keys:
 
@@ -145,13 +147,18 @@ def main(params):
         if result:         
             result_list.append(result)
 
-        json_result = {"result": result_list, "error": {}}
-        print(f'json_result: {json_result}')
-        return json_result
+        result_dict = {}
+        result_dict["result"] = result_list
+        result_dict["status"] = "SUCCESS"
+        
+        return result_dict
+
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = {"result": {}, "error": err}
-        return json_result
+        result_dict = {}
+        result_dict["error"] = err
+        result_dict["status"] = "FAILURE"        
+        return result_dict
 
     return {"result": "Flow should not reach here"}
 
@@ -161,7 +168,7 @@ if __name__ == "__main__":
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
         'final_pdf_folder': 'final_pdf',
-        'submission_id': '43',
+        'submission_id': 45,
         'submissions_data_folder': 'submission_documents_data',
         'mode': 'runtime'
     }

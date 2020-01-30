@@ -46,7 +46,7 @@ def main(params):
         if mode is None or "":
             raise Exception("Pass mode")    
 
-        object_storage_key = submissions_data_folder + "/" + mode + "/" + submission_id 
+        object_storage_key = submissions_data_folder + "/" + mode + "/" + str(submission_id)
         
         regex = r"^" + object_storage_key + ".*$"
         
@@ -153,14 +153,18 @@ def main(params):
         if result:         
             result_list.append(result)
 
-        json_result = {"result": result_list, "error": {}}
-        print(f'json_result: {json_result}')
-        return json_result
+        result_dict = {}
+        result_dict["result"] = result_list
+        result_dict["status"] = "SUCCESS"
+        
+        return result_dict
 
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        json_result = {"result": {}, "error": err}
-        return json_result
+        result_dict = {}
+        result_dict["error"] = err
+        result_dict["status"] = "FAILURE"        
+        return result_dict
 
     return {"result": "Flow should not reach here"}
 
