@@ -25,7 +25,7 @@ convertio_api_key = '92aa5b192c0981506a44a2c094af8cd9'
 OBJECT_STORAGE_PUBLIC_URL="https://everest-submission-bucket.s3.us-south.cloud-object-storage.appdomain.cloud"
 
 def main(params):
-    logging.info('Calling fn_document_conversion.')
+    logging.info('Calling fn_document_conversion_pdf.')
 
     try:
 
@@ -46,7 +46,7 @@ def main(params):
         if mode is None or "":
             raise Exception("Pass mode")    
 
-        object_storage_key = submissions_data_folder + "/" + mode + "/" + str(submission_id)
+        object_storage_key = submissions_data_folder + "/" + mode + "/" + str(submission_id) + "/"
         
         regex = r"^" + object_storage_key + ".*$"
         
@@ -60,7 +60,7 @@ def main(params):
                 file_name = os.path.basename(key)    
                 file_name_without_ext, file_extension = os.path.splitext(file_name)    
                 
-                url = OBJECT_STORAGE_PUBLIC_URL + "/" + object_storage_key + "/" + quote(file_name)
+                url = OBJECT_STORAGE_PUBLIC_URL + "/" + object_storage_key + quote(file_name)
                 PARAMS = {"apikey": convertio_api_key, "input": "url", "file": url , "outputformat": "pdf"}
                 
                 print (url)
@@ -103,7 +103,7 @@ def main(params):
                                 if code == 200 and status == "ok":
                                     content = return_val["data"]["content"]
 
-                                    pdf_object_storage_key = object_storage_key + "/" + "final_pdf"  + "/" + file_name_without_ext + ".pdf"
+                                    pdf_object_storage_key = object_storage_key  + "final_pdf"  + "/" + file_name_without_ext + ".pdf"
                                     print("cos_everest_submission_bucket: {}: pdf_object_storage_key: {} ".format(cos_everest_submission_bucket, pdf_object_storage_key))    
                                     
                                     # Write attachments to the object storage                

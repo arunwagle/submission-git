@@ -49,27 +49,28 @@ def main(params):
             raise Exception("Pass mode")
 
         final_pdf_object_storage_key = submissions_data_folder + "/" + \
-            mode + "/" + str(submission_id) + "/final_pdf_split"
+            mode + "/" + str(submission_id) + "/"
+            # + "/final_pdf_split"
         final_txt_object_storage_key_prefix = submissions_data_folder + \
-            "/" + mode + "/" + str(submission_id)
-            # + "/final_pdf"
+            "/" + mode + "/" + str(submission_id) 
 
-        regex = r"^" + final_pdf_object_storage_key + ".*$"
+
+        regex = r"^" + final_pdf_object_storage_key + ".*(?i)(pdf|htm).*$"
 
         file_keys = cosutils.get_bucket_contents(
             cos_everest_submission_bucket, regex)
 
-        extensions = ['.pdf']
+        extensions = ['.pdf', '.html', '.htm']
 
         for key in file_keys:
-
-            if key.endswith(tuple(extensions)):
+            print ("key:{}".format(key))
+            if key.lower().endswith(tuple(extensions)):
                 file_name = os.path.basename(key)
                 file_name_without_ext, file_extension = os.path.splitext(
                     file_name)
 
                 url = OBJECT_STORAGE_PUBLIC_URL + "/" + \
-                    final_pdf_object_storage_key + "/" + quote(file_name)
+                    quote(key)
                 PARAMS = {"apikey": convertio_api_key,
                     "input": "url", "file": url, "outputformat": "txt"}
 
@@ -78,14 +79,27 @@ def main(params):
                 db_conn = db2utils.get_connection()
                 print("db_conn: {}".format(db_conn))
                 sql = f'''SELECT EVRE_LEARNING_EMAIL_ATTACHMENTS_ID FROM EVERESTSCHEMA.EVRE_LEARNING_SPLIT_CONTENT 
-                where  EVRE_EMAIL_MSG_ID={submission_id} and DOCUMENT_NAME='{key}' and DOCUMENT_TYPE='.pdf' '''
+                where  EVRE_EMAIL_MSG_ID={submission_id} and DOCUMENT_NAME='{key}' and DOCUMENT_TYPE='{file_extension}' '''
                 print("sql: {}".format(sql))
 
                 stmt = ibm_db.exec_immediate(db_conn, sql)
+                
                 result = ibm_db.fetch_both(stmt)
                 pdf_id = None
                 if result:
                     pdf_id = result["EVRE_LEARNING_EMAIL_ATTACHMENTS_ID"]
+                else:
+                    sql = f'''SELECT ID FROM EVERESTSCHEMA.evre_learning_email_attachments 
+                    where  EVRE_EMAIL_MSG_ID={submission_id} and DOCUMENT_NAME='{key}' and DOCUMENT_TYPE='{file_extension}' '''
+                    print("sql: {}".format(sql))
+
+                    stmt = ibm_db.exec_immediate(db_conn, sql)
+                    result = ibm_db.fetch_both(stmt)
+                    if result:
+                        pdf_id = result["ID"]
+                    else:
+                        raise Exception("pdf_id is not present. Check the data")
+
 
                 # sending get request and saving the response as response object
                 r = requests.post(url=CONVERT_IO_URL,

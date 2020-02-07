@@ -91,7 +91,7 @@ class EmailAttachmentClass(object):
         """
         return self.__msg.sExists([self.__dir, filename])
 
-    def save(self, contentId=False, json=False, useFileName=False, raw=False, customPath=None, customFilename=None, object_storage_bucket_name=None, object_storage_key_prefix = None, save_to_object_storage=False, msg_id=None, msg_encoded_id=None, msg_document_id=None):
+    def save(self, contentId=False, json=False, useFileName=False, raw=False, customPath=None, customFilename=None, object_storage_bucket_name=None, object_storage_key_prefix = None, save_to_object_storage=False, msg_id=None, msg_encoded_id=None, msg_document_id=None, mode=None):
         # Check if the user has specified a custom filename
         filename = None
 
@@ -156,7 +156,7 @@ class EmailAttachmentClass(object):
                                     '{file_extension}',
                                     'N/A',
                                     'CONVERT_TO_PDF',
-                                    'RUNTIME') 
+                                    '{mode}') 
                                 )       
                                 '''
                     # print ("sql: {}".format(sql))
@@ -172,12 +172,12 @@ class EmailAttachmentClass(object):
                     raise Exception("File upload to object storage failed")  
 
         else:
-            self.saveEmbededMessage(contentId, json, useFileName, raw, customPath, customFilename)
+            self.saveEmbededMessage(contentId, json, useFileName, raw, customPath, customFilename, mode)
         return attachment_id
 
     def saveEmbededMessage(self, contentId=False, json=False, useFileName=False, raw=False, customPath=None,
-                           customFilename=None):
-        self.data.save(json, useFileName, raw, contentId, customPath, customFilename)
+                           customFilename=None, mode=None):
+        self.data.save(json, useFileName, raw, contentId, customPath, customFilename, mode)
 
     @property
     def cid(self):

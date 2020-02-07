@@ -5,6 +5,6 @@
 ### Step3 Push the docker image to the docker repo
 # https://hub.docker.com/repository/docker/arunwagle123/ibm_cloudfunctions_repo/tags?page=1
 
-docker build --pull --no-cache -t arunwagle123/ibm_cloudfunctions_repo:submission_intake_7 .
+docker build --pull --no-cache -t arunwagle123/ibm_cloudfunctions_repo:submission_intake_8 .
 
-docker push arunwagle123/ibm_cloudfunctions_repo:submission_intake_7
+docker push arunwagle123/ibm_cloudfunctions_repo:submission_intake_8

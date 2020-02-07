@@ -51,12 +51,12 @@ def main(params):
             raise Exception("Pass mode")
 
         object_storage_key = submissions_data_folder + "/" + \
-            mode + "/" + str(submission_id)
+            mode + "/" + str(submission_id) + "/"
         
         # + "/" + final_pdf_folder
 
         extensions = ['pdf']
-        regex = r"^" + object_storage_key + ".*$"
+        regex = r"^" + object_storage_key + ".*pdf$"
 
         file_keys = cosutils.get_bucket_contents(
             cos_everest_submission_bucket, regex)
@@ -94,7 +94,7 @@ def main(params):
                     pdf_writer.addPage(pdf.getPage(page))
 
                     split_pdf_dir = "final_pdf_split"
-                    output_filename_key = '{}/{}/{}_page_{}.pdf'.format(
+                    output_filename_key = '{}{}/{}_page_{}.pdf'.format(
                         object_storage_key, split_pdf_dir, file_name_without_ext, page+1)
                     tmp = BytesIO()
                     pdf_writer.write(tmp)

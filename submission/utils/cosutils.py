@@ -139,7 +139,7 @@ def delete_all_files(bucket_name):
     try:
         cos = get_cos_resource()
         files = cos.Bucket(bucket_name).objects.all()
-        filtered = filter(lambda file: re.match(r"^submission_documents_data/training",file.key), files)  
+        filtered = filter(lambda file: re.match(r"^submission_documents_data/RUNTIME/.*standardized_txt_dir.*$",file.key), files)  
         object_dict = dict()
         
         key_list = []
@@ -169,8 +169,10 @@ def delete_all_files(bucket_name):
 
 if __name__ == "__main__":
   
-    # delete_all_files ("everest-submission-bucket")
-    get_filtered_bucket_contents("everest-submission-bucket")
+    delete_all_files ("everest-submission-bucket")
+    # get_filtered_bucket_con
+    # 
+    # tents("everest-submission-bucket")
     # get_buckets()
 
     # get_bucket_contents("cos-everest-submission-data", r"^email_message_data.*msg$")

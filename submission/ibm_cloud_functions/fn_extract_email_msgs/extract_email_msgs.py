@@ -29,7 +29,7 @@ OBJECT_STORAGE_EMAIL_ATTACHMENTS_ROOT_FOLDER = "submission_documents_data"
 
 
 def main(params):
-    logging.info('Calling extract_outlook_msg.')
+    logging.info('Calling fn_extract_email_msgs.')
 
     try:
 
@@ -38,19 +38,21 @@ def main(params):
         if cos_everest_submission_bucket is None or "":
             raise Exception("Pass location of the bucket")
 
-        object_id = params.get("submission_id", None)
-        if object_id is None or "":
+        submission_id = params.get("submission_id", None)
+        if submission_id is None or "":
             raise Exception("Pass submission_id ")
 
-        # Create a directory on the local drive
-        object_storage_key_prefix = OBJECT_STORAGE_EMAIL_ATTACHMENTS_ROOT_FOLDER + "/runtime"    
-        
-        # with DB2DBConnection() as db_conn:
+        mode = params.get("mode", None)
+        if mode is None or "":
+            raise Exception("Pass mode ")
 
+        # Create a directory on the local drive
+        object_storage_key_prefix = OBJECT_STORAGE_EMAIL_ATTACHMENTS_ROOT_FOLDER + "/" + mode    
+        
         db_conn = db2utils.get_connection()
         print("db_conn: {}".format(db_conn))
 
-        sql = f'''SELECT ID, DOCUMENT_NAME, ENCODED_ID, HEX(ENCODED_ID) as MSG_DOCUMENT_ID FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS where ID={object_id}'''
+        sql = f'''SELECT ID, DOCUMENT_NAME, ENCODED_ID, HEX(ENCODED_ID) as MSG_DOCUMENT_ID FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS where ID={submission_id}'''
         stmt = ibm_db.exec_immediate(db_conn, sql)
         result = ibm_db.fetch_both(stmt)
         msg_object_storage_key = None
@@ -108,7 +110,7 @@ def main(params):
                             '.txt',
                             'N/A',
                             'CONVERT_TO_PDF',
-                            'RUNTIME') 
+                            '{mode}') 
                         )       
                         '''
             # print ("sql: {}".format(sql))
@@ -141,7 +143,8 @@ def main(params):
                                 save_to_object_storage=True,
                                 msg_id=msg_id,
                                 msg_encoded_id=msg_encoded_id,
-                                msg_document_id=msg_document_id)
+                                msg_document_id=msg_document_id,
+                                mode=mode)
 
 
         sql = f'''SELECT ID, STATUS, TO_CHAR(FIRST_UPDATED,'YYYY-MM-DD HH.MI.SS') as FIRST_UPDATED, 
@@ -179,7 +182,8 @@ if __name__ == "__main__":
     # python3 -m submission.ibm_cloud_functions.fn_extract_email_msgs.__main__
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
-        'submission_id': 43
+        'submission_id': 43,
+        'mode':'RUNTIME'
     }
 
     # p_json = json.dumps(param)

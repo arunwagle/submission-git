@@ -50,10 +50,12 @@ def main(params):
 
 
         object_storage_key = submissions_data_folder + "/" + \
-            mode + "/" + str(submission_id) + "/" + standardized_txt_dir
+            mode + "/" + str(submission_id) 
+            
+            # + "/" + standardized_txt_dir
 
         extensions = ['txt']
-        regex = r"^" + object_storage_key + ".*$"
+        regex = r"^" + object_storage_key + ".*txt$"
 
 
         file_keys = cosutils.get_bucket_contents(
@@ -65,16 +67,18 @@ def main(params):
         nlu_results_list = []
         for key in file_keys:
             print("Processing file:: {}",  file_keys)
+            if key.endswith(tuple(extensions)):
+                txt_file_bytes = cosutils.get_item(
+                        cos_everest_submission_bucket, key)
 
-            txt_file_bytes = cosutils.get_item(
-                    cos_everest_submission_bucket, key)
+                text = txt_file_bytes.decode("utf-8")
+                print("text:: ",  len(text.strip()))
 
-            text = txt_file_bytes.decode("utf-8")
-            # print("text:: {}",  text)
-
-            if text is Not None:
-                nlu_results = watson_nlu_utils.get_result(nlu_service, model_id, text)
-            nlu_results_list.append(nlu_results)
+                nlu_results = None
+                if text is not None and len(text.strip()) != 0 :
+                    nlu_results = watson_nlu_utils.get_result(nlu_service, model_id, text)
+                
+                nlu_results_list.append(nlu_results)
 
 
         # db_conn = db2utils.get_connection()
