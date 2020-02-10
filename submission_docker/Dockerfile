@@ -14,6 +14,5 @@ RUN pip3 install  \
    python-Levenshtein \
    extract_msg \
    convertapi \
-   stringcase \
-   arunwagle-submission-intake-utils==1.0.7
+   arunwagle-submission-intake-utils==1.0.8
    

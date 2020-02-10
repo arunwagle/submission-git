@@ -44,5 +44,5 @@ ibmcloud fn action create submission_intake/split_pdf --docker arunwagle123/ibm_
 #ibmcloud fn action create submission_intake/doc_converto_txt --kind python:3.7 --timeout 120000 fn_doc_converto_txt.zip 
 ibmcloud fn action create submission_intake/doc_converto_txt --docker arunwagle123/ibm_cloudfunctions_repo:submission_intake_8 --timeout 300000 submission/ibm_cloud_functions/fn_doc_converto_txt/doc_convert_to_txt.py 
 
-
+ibmcloud fn action create submission_intake/get_submission_results --docker arunwagle123/ibm_cloudfunctions_repo:submission_intake_9 --timeout 120000 --web true -a web-custom-options false submission/ibm_cloud_functions/fn_get_submission_results/get_submission_results.py 
 

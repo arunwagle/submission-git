@@ -56,7 +56,7 @@ def main(params):
         # + "/" + final_pdf_folder
 
         extensions = ['pdf']
-        regex = r"^" + object_storage_key + ".*pdf$"
+        regex = r"^" + object_storage_key + ".*(?i)(pdf).*$"
 
         file_keys = cosutils.get_bucket_contents(
             cos_everest_submission_bucket, regex)
@@ -65,17 +65,18 @@ def main(params):
 
         for key in file_keys:
 
-            if key.endswith(tuple(extensions)):
+            if key.lower().endswith(tuple(extensions)):
                 file_name = os.path.basename(key)
                 file_name_without_ext, file_extension = os.path.splitext(file_name)
 
                 pdf_file_bytes = cosutils.get_item(
                     cos_everest_submission_bucket, key)
-
+                
+                
                 db_conn = db2utils.get_connection()
                 print("db_conn: {}".format(db_conn))
                 sql = f'''SELECT ID FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_ATTACHMENTS 
-                where  EVRE_EMAIL_MSG_ID={submission_id} and DOCUMENT_NAME='{key}' and DOCUMENT_TYPE='.pdf' '''
+                where  EVRE_EMAIL_MSG_ID={submission_id} and DOCUMENT_NAME='{key}' '''
                 print("sql: {}".format(sql))
 
                 stmt = ibm_db.exec_immediate(db_conn, sql)
@@ -85,6 +86,7 @@ def main(params):
                     pdf_id = result["ID"]
 
                 # read pdf
+                
                 pdf = PdfFileReader(BytesIO(pdf_file_bytes))
                 num_of_pages = pdf.getNumPages()
                 print("num_of_pages:: {} ", num_of_pages)
@@ -164,13 +166,13 @@ def main(params):
 
 
 if __name__ == "__main__":
-    # python3 -m submission.ibm_cloud_functions.fn_split_pdf.__main__
+    # python3 -m submission.ibm_cloud_functions.fn_split_pdf.split_pdf
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
         'final_pdf_folder': 'final_pdf',
-        'submission_id': 45,
+        'submission_id': 75,
         'submissions_data_folder': 'submission_documents_data',
-        'mode': 'runtime'
+        'mode': 'RUNTIME'
     }
 
     # p_json = json.dumps(param)

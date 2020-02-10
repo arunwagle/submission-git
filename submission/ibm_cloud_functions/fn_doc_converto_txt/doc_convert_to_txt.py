@@ -55,7 +55,7 @@ def main(params):
             "/" + mode + "/" + str(submission_id) 
 
 
-        regex = r"^" + final_pdf_object_storage_key + ".*(?i)(pdf|htm).*$"
+        regex = r"^" + final_pdf_object_storage_key + ".*(?i)(PDF|pdf|htm|HTM).*$"
 
         file_keys = cosutils.get_bucket_contents(
             cos_everest_submission_bucket, regex)

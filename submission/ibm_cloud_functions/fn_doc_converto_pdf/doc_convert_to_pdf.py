@@ -56,7 +56,7 @@ def main(params):
     
         for key in file_keys:
             
-            if key.endswith(tuple(extensions)) : 
+            if key.lower().endswith(tuple(extensions)) : 
                 file_name = os.path.basename(key)    
                 file_name_without_ext, file_extension = os.path.splitext(file_name)    
                 
