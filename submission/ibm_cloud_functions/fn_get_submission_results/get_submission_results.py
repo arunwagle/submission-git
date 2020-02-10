@@ -44,21 +44,20 @@ def main(params):
 
         mode = params.get("mode", None)
         if mode is None or "":
-            raise Exception("Pass mode")     
+            raise Exception("Pass mode")
 
         object_storage_key = submissions_data_folder + "/" + \
             mode + "/" + str(submission_id) + "/" + \
             "nlu_results" + "/" + "output.json"
 
-       txt_file_bytes = cosutils.get_item(
-                    cos_everest_submission_bucket, object_storage_key)
+        txt_file_bytes = cosutils.get_item(cos_everest_submission_bucket, object_storage_key)
 
-        text = txt_file_bytes.decode("utf-8")
-
-        nlu_results_dict = json.loads(text) 
-        print("nlu_results_dict::", nlu_results_dict)        
-        nlu_results_dict["status"] = "SUCCESS"
+        text = txt_file_bytes.decode("utf-8").replace("'", '"')
         
+
+        nlu_results_dict = json.loads(text)             
+        nlu_results_dict["status"] = "SUCCESS"
+        print("nlu_results_dict::", nlu_results_dict)    
         return nlu_results_dict
 
     except (ibm_db.conn_error, ibm_db. conn_errormsg, Exception) as err:
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
         'nlp_results_dir': 'nlp_results',
-        'submission_id': 46,
+        'submission_id': 74,
         'submissions_data_folder': 'submission_documents_data',
         'mode': 'RUNTIME',
         

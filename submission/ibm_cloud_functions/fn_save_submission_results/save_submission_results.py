@@ -88,10 +88,9 @@ def main(params):
         nlu_results_dict = {}
         nlu_response = get_clean_results(nlu_results_list)
         nlu_results_dict["result"] = nlu_response
-        
+
         res_bytes = str(nlu_results_dict).encode('utf-8')
         print("res_bytes::", res_bytes)
-        
 
         #  store in object storage
         return_val = cosutils.save_file(
@@ -155,16 +154,15 @@ def get_validation_status(nlu_response):
     if nlu_response is None:
         validation_results["status"] = "VALIDATION_ERROR"
         validation_results["message"] = "No Data Found"
+    if all(key in nlu_response for key in ("FN_INSURED_VALUE", "POLICY_EFF_DT_VALUE", "POLICY_EXP_DT_VALUE", "TOTAL_TIV_VALUE")):
+        print("keys are present")
+        validation_results["status"] = "COMPLETED"
+        validation_results["message"] = "SUCCESS"
     else:
+        print("keys are not present")
+        validation_results["status"] = "VALIDATION_ERROR"
+        validation_results["message"] = "Required fields missing: FN_INSURED_VALUE, POLICY_EFF_DT_VALUE, POLICY_EXP_DT_VALUE, TOTAL_TIV_VALUE "
 
-        for key, value_list in nlu_response.items():
-
-            if key not in ("FN_INSURED_VALUE", "POLICY_EFF_DT_VALUE", "POLICY_EXP_DT_VALUE", "TOTAL_TIV_VALUE"):
-                validation_results["status"] = "VALIDATION_ERROR"
-                validation_results["message"] = "Required fields missing: FN_INSURED_VALUE, POLICY_EFF_DT_VALUE, POLICY_EXP_DT_VALUE, TOTAL_TIV_VALUE "
-                break
-                
-                
     return validation_results
 
 
@@ -175,7 +173,7 @@ def get_clean_results(nlu_results_list):
     for nlu_result_dict in nlu_results_list:
         if nlu_result_dict is None:
             continue
-        
+
         for key, value in nlu_result_dict.items():
             # if value not in merged_dict.values():
             merged_dict[key].append(value)
@@ -191,8 +189,9 @@ def get_clean_results(nlu_results_list):
             if key not in "AGENT_LIST":
                 new_value = list(dict.fromkeys(flat_list))
             else:
-                new_value = merge_list_of_dicts_by_key(
-                    chain(flat_list), "AGENT_NAME_VALUE")
+                new_value = list(merge_list_of_dicts_by_key(
+                    chain(flat_list), "AGENT_NAME_VALUE"))
+                # print (new_value)    
 
         result[key] = new_value
 
