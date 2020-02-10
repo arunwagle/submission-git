@@ -8,16 +8,18 @@ import zipfile
 import json
 import time
 
-import uuid 
+import uuid
 import extract_msg
 
-import ibm_db, ibm_db_dbi
+import ibm_db
+import ibm_db_dbi
 
 from submission.utils import cosutils, db2utils
 from submission.ibm_cloud_functions.fn_extract_email_msgs import extract_email_msgs
 from submission.ibm_cloud_functions.fn_doc_converto_pdf import doc_convert_to_pdf
 from submission.ibm_cloud_functions.fn_split_pdf import split_pdf
 from submission.ibm_cloud_functions.fn_doc_converto_txt import doc_convert_to_txt
+from submission.ibm_cloud_functions.fn_save_submission_results import save_submission_results
 
 logger = logging.getLogger()
 logging.basicConfig(
@@ -26,15 +28,15 @@ logging.basicConfig(
 )
 
 
-def run_doc_convert_to_txt (params):
+def run_doc_convert_to_txt(params):
 
     try:
-        
+
         cos_everest_submission_bucket = params.get(
             "cos_everest_submission_bucket", None)
         if cos_everest_submission_bucket is None or "":
             raise Exception("Pass location of the bucket")
-        
+
         mode = params.get(
             "mode", None)
         if mode is None or "":
@@ -43,18 +45,17 @@ def run_doc_convert_to_txt (params):
         status = params.get(
             "status", None)
         if status is None or "":
-            raise Exception("Pass status ")   
+            raise Exception("Pass status ")
 
         db_conn = db2utils.get_connection()
         print("db_conn: {}".format(db_conn))
 
-        
-        if status :
+        if status:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
                     where ID > 44 and USED_FOR = '{mode}' and status = '{status}' order by ID '''
-        else : 
+        else:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
-                where USED_FOR = '{mode}'  order by ID ''' 
+                where USED_FOR = '{mode}'  order by ID '''
 
         print("sql: {}".format(sql))
 
@@ -63,38 +64,36 @@ def run_doc_convert_to_txt (params):
 
         result_dict = {}
         while result:
-            id = str(result["ID"])            
+            id = str(result["ID"])
             mode = result["USED_FOR"]
-            
 
             param = {
-                'cos_everest_submission_bucket':'everest-submission-bucket',      
-                'submission_id':id ,
-                'submissions_data_folder':'submission_documents_data' ,
+                'cos_everest_submission_bucket': 'everest-submission-bucket',
+                'submission_id': id,
+                'submissions_data_folder': 'submission_documents_data',
                 'mode': mode
             }
 
             doc_convert_to_txt.main(param)
             # time.sleep(2)
             print(f'doc_convert_to_txt for : {id, param}')
-            
+
             result = ibm_db.fetch_assoc(stmt)
-            
-               
-                    
-        result_dict = {}        
+
+        result_dict = {}
         result_dict["status"] = "SUCCESS"
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        result_dict = {}        
+        result_dict = {}
         result_dict["status"] = "FAILURE"
 
     return {"result": "This flow should get executed"}
 
-def run_split_pdf (params):
+
+def run_split_pdf(params):
 
     try:
-        
+
         cos_everest_submission_bucket = params.get(
             "cos_everest_submission_bucket", None)
         if cos_everest_submission_bucket is None or "":
@@ -108,18 +107,17 @@ def run_split_pdf (params):
         status = params.get(
             "status", None)
         if status is None or "":
-            raise Exception("Pass status ")   
+            raise Exception("Pass status ")
 
         db_conn = db2utils.get_connection()
         print("db_conn: {}".format(db_conn))
 
-        
-        if status :
+        if status:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
                     where USED_FOR = '{mode}' and status = '{status}' order by ID '''
-        else : 
+        else:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
-                where USED_FOR = '{mode}'  order by ID ''' 
+                where USED_FOR = '{mode}'  order by ID '''
 
         print("sql: {}".format(sql))
 
@@ -128,9 +126,9 @@ def run_split_pdf (params):
 
         result_dict = {}
         while result:
-            id = str(result["ID"])            
+            id = str(result["ID"])
             mode = result["USED_FOR"]
-            
+
             param = {
                 'cos_everest_submission_bucket': cos_everest_submission_bucket,
                 'final_pdf_folder': 'final_pdf',
@@ -141,24 +139,23 @@ def run_split_pdf (params):
             split_pdf.main(param)
             # time.sleep(2)
             print(f'Split PDF for : {id, param}')
-            
+
             result = ibm_db.fetch_assoc(stmt)
-            
-               
-                    
-        result_dict = {}        
+
+        result_dict = {}
         result_dict["status"] = "SUCCESS"
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        result_dict = {}        
+        result_dict = {}
         result_dict["status"] = "FAILURE"
 
     return {"result": "This flow should get executed"}
 
-def run_convert_to_pdf (params):
+
+def run_convert_to_pdf(params):
 
     try:
-        
+
         cos_everest_submission_bucket = params.get(
             "cos_everest_submission_bucket", None)
         if cos_everest_submission_bucket is None or "":
@@ -172,19 +169,18 @@ def run_convert_to_pdf (params):
         status = params.get(
             "status", None)
         if status is None or "":
-            raise Exception("Pass status ")   
+            raise Exception("Pass status ")
 
         db_conn = db2utils.get_connection()
         print("db_conn: {}".format(db_conn))
 
-        
-        if status :
+        if status:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
                     where USED_FOR = '{mode}' and status = '{status}' order by ID '''
-        else : 
+        else:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
-                where USED_FOR = '{mode}'  order by ID ''' 
-        
+                where USED_FOR = '{mode}'  order by ID '''
+
         print("sql: {}".format(sql))
 
         stmt = ibm_db.exec_immediate(db_conn, sql)
@@ -192,35 +188,34 @@ def run_convert_to_pdf (params):
 
         result_dict = {}
         while result:
-            id = str(result["ID"])            
+            id = str(result["ID"])
             mode = result["USED_FOR"]
             param = {
                 'cos_everest_submission_bucket': cos_everest_submission_bucket,
                 'submission_id': id,
-                'submissions_data_folder':'submission_documents_data' ,
+                'submissions_data_folder': 'submission_documents_data',
                 'mode': mode
             }
             doc_convert_to_pdf.main(param)
             # time.sleep(2)
             print(f'Converting to PDF for : {id, param}')
-            
+
             result = ibm_db.fetch_assoc(stmt)
-            
-               
-                    
-        result_dict = {}        
+
+        result_dict = {}
         result_dict["status"] = "SUCCESS"
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        result_dict = {}        
+        result_dict = {}
         result_dict["status"] = "FAILURE"
 
     return {"result": "This flow should get executed"}
 
-def run_extract_email_msg (params):
+
+def run_extract_email_msg(params):
 
     try:
-        
+
         cos_everest_submission_bucket = params.get(
             "cos_everest_submission_bucket", None)
         if cos_everest_submission_bucket is None or "":
@@ -232,17 +227,17 @@ def run_extract_email_msg (params):
             raise Exception("Pass RUNTIME or TRAINING")
 
         limit = params.get(
-            "limit", None)        
+            "limit", None)
 
         db_conn = db2utils.get_connection()
         print("db_conn: {}".format(db_conn))
 
-        if limit :
+        if limit:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
                     where USED_FOR = '{mode}' order by ID LIMIT {limit}'''
-        else : 
+        else:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
-                    where USED_FOR = '{mode}' order by ID '''                  
+                    where USED_FOR = '{mode}' order by ID '''
 
         print("sql: {}".format(sql))
 
@@ -251,7 +246,7 @@ def run_extract_email_msg (params):
 
         result_dict = {}
         while result:
-            id = str(result["ID"])            
+            id = str(result["ID"])
             mode = result["USED_FOR"]
             param = {
                 'cos_everest_submission_bucket': cos_everest_submission_bucket,
@@ -262,20 +257,90 @@ def run_extract_email_msg (params):
             print(f'Extracting Email message for : {id, param}')
             extract_email_msgs.main(param)
             result = ibm_db.fetch_assoc(stmt)
-               
-                    
-        result_dict = {}        
+
+        result_dict = {}
         result_dict["status"] = "SUCCESS"
     except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
         logging.exception(err)
-        result_dict = {}        
+        result_dict = {}
+        result_dict["status"] = "FAILURE"
+
+    return {"result": "This flow should get executed"}
+
+
+def run_save_submission_results(params):
+
+    try:
+
+        cos_everest_submission_bucket = params.get(
+            "cos_everest_submission_bucket", None)
+        if cos_everest_submission_bucket is None or "":
+            raise Exception("Pass location of the bucket")
+
+        mode = params.get(
+            "mode", None)
+        if mode is None or "":
+            raise Exception("Pass RUNTIME or TRAINING")
+
+        status = params.get(
+            "status", None)
+        if status is None or "":
+            raise Exception("Pass status ")
+
+        model_id = params.get(
+            "model_id", None)
+        if model_id is None or "":
+            raise Exception("Pass model_id")
+
+        standardized_txt_dir = params.get("standardized_txt_dir", None)
+        if standardized_txt_dir is None or "":
+            raise Exception("Pass standardized_txt_dir")
+
+        db_conn = db2utils.get_connection()
+        print("db_conn: {}".format(db_conn))
+
+        if status:
+            sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
+                    where USED_FOR = '{mode}' and status = '{status}' order by ID '''
+        else:
+            sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
+                where USED_FOR = '{mode}'  order by ID '''
+
+        print("sql: {}".format(sql))
+
+        stmt = ibm_db.exec_immediate(db_conn, sql)
+        result = ibm_db.fetch_assoc(stmt)
+
+        result_dict = {}
+        while result:
+            id = str(result["ID"])
+            mode = result["USED_FOR"]
+            param = {
+                'cos_everest_submission_bucket': cos_everest_submission_bucket,
+                'submission_id': id,
+                'submissions_data_folder': 'submission_documents_data',
+                'standardized_txt_dir': standardized_txt_dir,
+                'mode': mode,
+                'model_id': model_id
+            }
+            save_submission_results.main(param)
+            # time.sleep(2)
+            print(f'Apply NLP and save results:: {id, param}')
+
+            result = ibm_db.fetch_assoc(stmt)
+
+        result_dict = {}
+        result_dict["status"] = "SUCCESS"
+    except (ibm_db.conn_error, ibm_db.conn_errormsg, Exception) as err:
+        logging.exception(err)
+        result_dict = {}
         result_dict["status"] = "FAILURE"
 
     return {"result": "This flow should get executed"}
 
 
 if __name__ == "__main__":
-    # python3 -m submission.ibm_cloud_functions.fn_batch_process.__main__
+    # python3 -m submission.ibm_cloud_functions.fn_batch_process.run_batch
     # params = {
     #     'cos_everest_submission_bucket':'everest-submission-bucket'   ,
     #     'mode': 'RUNTIME',
@@ -297,12 +362,18 @@ if __name__ == "__main__":
     # }
     # run_split_pdf(params)
 
-    params = {
-        'cos_everest_submission_bucket':'everest-submission-bucket'   ,
-        'mode': 'RUNTIME',
-        'status': 'STANDARDIZE_TO_TXT'
-    }
-    run_doc_convert_to_txt(params)
-    
-    
+    # params = {
+    #     'cos_everest_submission_bucket':'everest-submission-bucket'   ,
+    #     'mode': 'RUNTIME',
+    #     'status': 'STANDARDIZE_TO_TXT'
+    # }
+    # run_doc_convert_to_txt(params)
 
+    params = {
+        'cos_everest_submission_bucket': 'everest-submission-bucket',
+        'mode': 'RUNTIME',
+        'status': 'APPLY_NLP',
+        'model_id': 'c85996b7-d62e-4158-a80d-47089cf0fd4e',
+        'standardized_txt_dir': 'standardized_txt_dir'
+    }
+    run_save_submission_results(params)
