@@ -81,7 +81,7 @@ def main(params):
 
                 stmt = ibm_db.exec_immediate(db_conn, sql)
                 result = ibm_db.fetch_both(stmt)
-                pdf_id = None
+                pdf_id = -1
                 if result:
                     pdf_id = result["ID"]
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
         'final_pdf_folder': 'final_pdf',
-        'submission_id': 75,
+        'submission_id': 61,
         'submissions_data_folder': 'submission_documents_data',
         'mode': 'RUNTIME'
     }

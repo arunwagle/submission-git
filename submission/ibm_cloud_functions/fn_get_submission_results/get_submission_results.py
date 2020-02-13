@@ -76,7 +76,7 @@ if __name__ == "__main__":
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
         'nlp_results_dir': 'nlp_results',
-        'submission_id': 74,
+        'submission_id': 61,
         'submissions_data_folder': 'submission_documents_data',
         'mode': 'RUNTIME',
         

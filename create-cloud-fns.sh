@@ -46,3 +46,5 @@ ibmcloud fn action create submission_intake/doc_converto_txt --docker arunwagle1
 
 ibmcloud fn action create submission_intake/get_submission_results --docker arunwagle123/ibm_cloudfunctions_repo:submission_intake_9 --timeout 120000 --web true -a web-custom-options false submission/ibm_cloud_functions/fn_get_submission_results/get_submission_results.py 
 
+ibmcloud fn action create submission_intake/get_document_details --docker arunwagle123/ibm_cloudfunctions_repo:submission_intake_9 --timeout 120000 --web true -a web-custom-options false submission/ibm_cloud_functions/fn_get_document_details/get_document_details.py 
+

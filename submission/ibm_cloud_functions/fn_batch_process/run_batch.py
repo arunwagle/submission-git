@@ -52,7 +52,7 @@ def run_doc_convert_to_txt(params):
 
         if status:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
-                    where ID > 44 and USED_FOR = '{mode}' and status = '{status}' order by ID '''
+                    where USED_FOR = '{mode}' and status = '{status}' order by ID '''
         else:
             sql = f'''SELECT ID, USED_FOR FROM EVERESTSCHEMA.EVRE_LEARNING_EMAIL_MSGS 
                 where USED_FOR = '{mode}'  order by ID '''

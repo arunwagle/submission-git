@@ -170,12 +170,12 @@ def main(params):
 
     
 if __name__ == "__main__":
-    # python3 -m submission.ibm_cloud_functions.fn_doc_converto_pdf.__main__
+    # python3 -m submission.ibm_cloud_functions.fn_doc_converto_pdf.doc_convert_to_pdf
     param = {
         'cos_everest_submission_bucket':'everest-submission-bucket',      
-        'submission_id':'43' ,
+        'submission_id':'61' ,
         'submissions_data_folder':'submission_documents_data' ,
-        'mode':'runtime'
+        'mode':'RUNTIME'
     }
 
     # p_json = json.dumps(param)

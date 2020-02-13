@@ -160,7 +160,7 @@ def main(params):
         result_list = []
         if result:
             id = str(result["ID"])            
-            result_list.append(result)
+            result_list.append(result)  
 
         result_dict = {}
         result_dict["result"] = result_list

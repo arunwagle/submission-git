@@ -51,11 +51,12 @@ def main(params):
         final_pdf_object_storage_key = submissions_data_folder + "/" + \
             mode + "/" + str(submission_id) + "/"
             # + "/final_pdf_split"
+        
         final_txt_object_storage_key_prefix = submissions_data_folder + \
             "/" + mode + "/" + str(submission_id) 
 
 
-        regex = r"^" + final_pdf_object_storage_key + ".*(?i)(PDF|pdf|htm|HTM).*$"
+        regex = r"^" + final_pdf_object_storage_key + ".*(?i)(pdf|htm).*$"
 
         file_keys = cosutils.get_bucket_contents(
             cos_everest_submission_bucket, regex)
@@ -68,6 +69,13 @@ def main(params):
                 file_name = os.path.basename(key)
                 file_name_without_ext, file_extension = os.path.splitext(
                     file_name)
+
+                print("file_extension::", file_extension)
+                print("is final_pdf_split::", "final_pdf_split" not in key)
+                
+                if file_extension.lower() in (".pdf")  and "final_pdf_split" not in key :
+                    print("Continue for loop")
+                    continue
 
                 url = OBJECT_STORAGE_PUBLIC_URL + "/" + \
                     quote(key)
@@ -103,7 +111,7 @@ def main(params):
 
                 # sending get request and saving the response as response object
                 r = requests.post(url=CONVERT_IO_URL,
-                                  data=json.dumps(PARAMS), stream=True)
+                                  data=json.dumps(PARAMS)   )
 
                 return_val = json.loads(r.text)
                 print("1......return_val::{}", return_val)
@@ -117,7 +125,7 @@ def main(params):
                     check_status_url = CONVERT_IO_URL + "/" + id + "/status"
                     print("check_status_url::", check_status_url)
                     while True:
-                        r = requests.get(url=check_status_url)
+                        r = requests.get(url=check_status_url, stream=True)
                         return_val = json.loads(r.text)
                         print("2.......status::return_val::", return_val)
                         status = return_val["status"]
@@ -133,7 +141,8 @@ def main(params):
                                 # get content
                                 get_result_url = CONVERT_IO_URL + "/" + id + "/dl/base64"
                                 print("status::get_result_url::", get_result_url)
-                                r = requests.get(url=get_result_url)
+                                # , stream=True
+                                r = requests.get(url=get_result_url, stream=True)
                                 return_val = json.loads(r.text)
 
                                 status = return_val["status"]
@@ -210,12 +219,12 @@ def main(params):
 
     
 if __name__ == "__main__":
-    # python3 -m submission.ibm_cloud_functions.fn_doc_converto_txt.__main__
+    # python3 -m submission.ibm_cloud_functions.fn_doc_converto_txt.doc_convert_to_txt
     param = {
         'cos_everest_submission_bucket':'everest-submission-bucket',      
-        'submission_id':43 ,
+        'submission_id':61 ,
         'submissions_data_folder':'submission_documents_data' ,
-        'mode':'runtime'
+        'mode':'RUNTIME'
     }
 
     # p_json = json.dumps(param)

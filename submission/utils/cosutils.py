@@ -139,7 +139,7 @@ def delete_all_files(bucket_name):
     try:
         cos = get_cos_resource()
         files = cos.Bucket(bucket_name).objects.all()
-        filtered = filter(lambda file: re.match(r"^submission_documents_data/RUNTIME/.*standardized_txt_dir.*$",file.key), files)  
+        filtered = filter(lambda file: re.match(r"^submission_documents_data/RUNTIME/.*nlu_results.*$",file.key), files)  
         object_dict = dict()
         
         key_list = []

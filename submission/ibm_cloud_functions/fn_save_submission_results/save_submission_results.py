@@ -154,7 +154,7 @@ def get_validation_status(nlu_response):
     if nlu_response is None:
         validation_results["status"] = "VALIDATION_ERROR"
         validation_results["message"] = "No Data Found"
-    if all(key in nlu_response for key in ("FN_INSURED_VALUE", "POLICY_EFF_DT_VALUE", "POLICY_EXP_DT_VALUE", "TOTAL_TIV_VALUE")):
+    if all(key in nlu_response for key in ("FN_INSURED_VALUE", "POLICY_EFF_DT_VALUE", "POLICY_EXP_DT_VALUE")):
         print("keys are present")
         validation_results["status"] = "COMPLETED"
         validation_results["message"] = "SUCCESS"
@@ -191,7 +191,7 @@ def get_clean_results(nlu_results_list):
             else:
                 new_value = list(merge_list_of_dicts_by_key(
                     chain(flat_list), "AGENT_NAME_VALUE"))
-                # print (new_value)    
+                #   print (new_value)    
 
         result[key] = new_value
 
@@ -203,10 +203,10 @@ if __name__ == "__main__":
     param = {
         'cos_everest_submission_bucket': 'everest-submission-bucket',
         'standardized_txt_dir': 'standardized_txt_dir',
-        'submission_id': 46,
+        'submission_id': 62,
         'submissions_data_folder': 'submission_documents_data',
         'mode': 'RUNTIME',
-        'model_id': 'c85996b7-d62e-4158-a80d-47089cf0fd4e'
+        'model_id': '0b7af735-7adb-4907-8693-e649f5a6c1fb'
     }
 
     # p_json = json.dumps(param)
